@@ -48,14 +48,17 @@ class LsaModel:
         self.lsa_matrix = svd.fit_transform(tf_idf_matrix)
         return self.lsa_matrix
 
-    #through cosinus calculate similarity
+    # through cosinus calculate similarity
     def calc_map_metric(self, k, targett):
         row_sums = self.lsa_matrix.sum(axis=1)
         norm_dtm_svd_matrix = self.lsa_matrix / row_sums[:, np.newaxis]
         dtm_svd_matrix_transpose = self.lsa_matrix.transpose()
         dot_norm_transpose = norm_dtm_svd_matrix.dot(dtm_svd_matrix_transpose)
         np.fill_diagonal(dot_norm_transpose, -1)
-        indexes_of_docs = np.argpartition(-dot_norm_transpose, axis=0, kth=k)
-        indexes_of_most_similar_docs = indexes_of_docs[:indexes_of_docs.shape[0], :k]
-        compare_group = np.add(targett[indexes_of_most_similar_docs].T, -targett)
+        compare_group = self.calc_metric_for_simularity_matrix(dot_norm_transpose, targett, k)
         return np.mean(np.count_nonzero(compare_group == 0, axis=0) / k)
+
+    def calc_metric_for_simularity_matrix(self, simularity_matrix, targett, k):
+        indexes_of_docs = np.argpartition(-simularity_matrix, axis=0, kth=k)
+        indexes_of_most_similar_docs = indexes_of_docs[:indexes_of_docs.shape[0], :k]
+        return np.add(targett[indexes_of_most_similar_docs].T, -targett)
