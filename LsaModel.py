@@ -26,7 +26,7 @@ class LsaModel:
         return csr_matrix((data, indices, intptr), dtype=int)
 
     def get_tf_idf_matrix(self, dtm_matrix):
-        number_of_all_documents = len(self.text_tokenize)
+        number_of_all_documents = len(self.docs)
         row_indices, col_indices = dtm_matrix.nonzero()
         term_occurences = np.array(list(Counter(col_indices).values()))
         number_of_words_in_text = dtm_matrix.sum(axis=1)
